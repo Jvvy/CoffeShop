@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Loja de Café</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- 🔝 Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">☕ Loja de Café</a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Olá, {{ user.username }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Entrar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'registro' %}">Registrar</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- 🎉 Banner -->
+<header class="bg-warning text-center py-5">
+    <div class="container">
+        <h1 class="display-4">Bem-vindo à melhor experiência com café</h1>
+        <p class="lead">Cafés especiais, atendimento de qualidade e muito mais.</p>
+        <a href="{% url 'lista_produtos' %}" class="btn btn-dark btn-lg mt-3">Ver cardápio</a>
+        
+    </div>
+</header>
+
+<!-- 🧾 Sobre a loja -->
+<section class="py-5 bg-light text-center">
+    <div class="container">
+        <h2>Sobre Nós</h2>
+        <p class="lead">Somos apaixonados por café! Fundada em 2023, nossa cafeteria oferece grãos selecionados e atendimento acolhedor.</p>
+    </div>
+</section>
+
+<!-- ⭐ Depoimentos -->
+<section class="py-5 text-center">
+    <div class="container">
+        <h3>O que dizem nossos clientes</h3>
+        <blockquote class="blockquote">“Melhor café que já tomei!”</blockquote>
+        <blockquote class="blockquote">“Ambiente incrível, atendimento nota 10.”</blockquote>
+    </div>
+</section>
+
+<!-- 📞 Rodapé -->
+<footer class="bg-dark text-white text-center py-3">
+    <div class="container">
+        <p>&copy; 2025 Loja de Café | contato@lojaexemplo.com</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -111,3 +111,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuração para Uso de Imagens ...:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Configuração de Login de Usuários ...:
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+
+LOGIN_URL = '/login/'  # caminho da view de login
