@@ -35,3 +35,4 @@ def lista_produtos(request):
     # só acessa se estiver logado
     produtos = Produto.objects.all()
     return render(request, 'cafeteria/lista.html', {'produtos': produtos})
+

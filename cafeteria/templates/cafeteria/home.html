@@ -1,73 +1,40 @@
+{% extends 'cafeteria/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Loja de Café</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 
-<!-- 🔝 Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="#">☕ Loja de Café</a>
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Olá, {{ user.username }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Sair</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Entrar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro' %}">Registrar</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
+{% block title %}Página Inicial - Loja de Café{% endblock %}
 
-<!-- 🎉 Banner -->
-<header class="bg-warning text-center py-5">
-    <div class="container">
-        <h1 class="display-4">Bem-vindo à melhor experiência com café</h1>
-        <p class="lead">Cafés especiais, atendimento de qualidade e muito mais.</p>
-        <a href="{% url 'lista_produtos' %}" class="btn btn-dark btn-lg mt-3">Ver cardápio</a>
-        
-    </div>
-</header>
+{% block content %}
 
-<!-- 🧾 Sobre a loja -->
-<section class="py-5 bg-light text-center">
-    <div class="container">
-        <h2>Sobre Nós</h2>
-        <p class="lead">Somos apaixonados por café! Fundada em 2023, nossa cafeteria oferece grãos selecionados e atendimento acolhedor.</p>
+<!-- 🎯 Banner principal com imagem de fundo -->
+<section class="text-center p-5 mb-4" style="background-image: url({% static 'imagens/banner-cafe.png' %}); background-size: cover; background-position: center; color: white;">
+    <div class="container py-5" style="background-color: rgba(0, 0, 0, 0.5); border-radius: 15px;">
+        <h1 class="display-4 fw-bold">Bem-vindo à Loja de Café</h1>
+        <p class="lead">O melhor café, direto para sua xícara ☕</p>
+        <a href="{% url 'lista_produtos' %}" class="btn btn-dark btn-lg mt-3">Ver Cardápio</a>
     </div>
 </section>
 
-<!-- ⭐ Depoimentos -->
-<section class="py-5 text-center">
+<!-- 📚 Nossa História -->
+<section class="py-5" style="background-color: #6F4E37;">
     <div class="container">
-        <h3>O que dizem nossos clientes</h3>
-        <blockquote class="blockquote">“Melhor café que já tomei!”</blockquote>
-        <blockquote class="blockquote">“Ambiente incrível, atendimento nota 10.”</blockquote>
+        <h2 class="text-center text-white mb-4">Nossa História</h2>
+        <p class="lead text-center text-white">
+            Fundada em 2023, a Loja de Café nasceu da paixão por bons cafés e bons momentos. 
+            Cada grão é escolhido a dedo para trazer qualidade e sabor em cada xícara.
+        </p>
     </div>
 </section>
 
-<!-- 📞 Rodapé -->
-<footer class="bg-dark text-white text-center py-3">
+<!-- 📍 Onde nos encontrar -->
+<section class="py-5 bg-light">
     <div class="container">
-        <p>&copy; 2025 Loja de Café | contato@lojaexemplo.com</p>
+        <h2 class="text-center mb-4" style="color: #6F4E37;">Onde nos Encontrar</h2>
+        <p class="text-center lead">
+            📍 Rua das Flores, 123 - Centro<br>
+            São Paulo - SP<br>
+            Aberto de Segunda a Sábado, das 08h às 20h.
+        </p>
     </div>
-</footer>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}
