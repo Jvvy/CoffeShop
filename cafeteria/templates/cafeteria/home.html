@@ -5,31 +5,40 @@
 
 {% block content %}
 
-<!-- 🎯 Banner principal com imagem de fundo -->
-<section class="text-center p-5 mb-4" style="background-image: url({% static 'imagens/banner-cafe.png' %}); background-size: cover; background-position: center; color: white;">
-    <div class="container py-5" style="background-color: rgba(0, 0, 0, 0.5); border-radius: 15px;">
-        <h1 class="display-4 fw-bold">Bem-vindo à Loja de Café</h1>
-        <p class="lead">O melhor café, direto para sua xícara ☕</p>
-        <a href="{% url 'lista_produtos' %}" class="btn btn-dark btn-lg mt-3">Ver Cardápio</a>
+<!-- 🎯 Banner principal -->
+<section class="text-center d-flex align-items-center justify-content-center" style="
+    background: linear-gradient(rgba(45, 32, 21, 0.6), rgba(45, 32, 21, 0.6)),
+    url('{% static 'imagens/banner-cafe-clean.jpg' %}') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+    min-height: 90vh;
+    width: 100%;
+    color: white;
+">
+    <div class="container text-white">
+        <h1 class="display-3 fw-bold">Bem-vindo à nossa Cafeteria</h1> <!-- display-3 = fonte grande -->
+        <p class="lead">O melhor café artesanal, servido com amor ☕</p>
+        <a href="{% url 'lista_produtos' %}" class="btn btn-outline-light btn-lg mt-3">Ver Cardápio</a>
     </div>
 </section>
 
 <!-- 📚 Nossa História -->
-<section class="py-5" style="background-color: #6F4E37;">
-    <div class="container">
-        <h2 class="text-center text-white mb-4">Nossa História</h2>
-        <p class="lead text-center text-white">
-            Fundada em 2023, a Loja de Café nasceu da paixão por bons cafés e bons momentos. 
-            Cada grão é escolhido a dedo para trazer qualidade e sabor em cada xícara.
+<section class="py-5 d-flex align-items-center" style="background-color: #f8f1e7; min-height: 70vh; width: 100%;">
+    <div class="container-fluid text-center">
+        <h2 class="display-5 fw-bold" style="color: #6F4E37;">Nossa História</h2> <!-- display-5 = fonte maior -->
+        <p class="lead" style="max-width: 900px; margin: auto; color: #5a3e28;">
+            Fundada em 2023, nossa cafeteria nasceu da paixão por cafés especiais e bons momentos. 
+            Cada grão é selecionado a dedo para trazer um sabor inesquecível em cada xícara. 
+            Venha viver uma experiência única conosco! ☕
         </p>
     </div>
 </section>
 
 <!-- 📍 Onde nos encontrar -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-4" style="color: #6F4E37;">Onde nos Encontrar</h2>
-        <p class="text-center lead">
+<section class="py-5 d-flex align-items-center" style="background-color: #6F4E37; min-height: 60vh; width: 100%;">
+    <div class="container-fluid text-center text-white">
+        <h2 class="display-5 fw-bold">Onde nos Encontrar</h2> <!-- display-5 também -->
+        <p class="lead" style="max-width: 700px; margin: auto;">
             📍 Rua das Flores, 123 - Centro<br>
             São Paulo - SP<br>
             Aberto de Segunda a Sábado, das 08h às 20h.
@@ -37,4 +46,18 @@
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ajuste geral da fonte para o site */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+</style>
 {% endblock %}

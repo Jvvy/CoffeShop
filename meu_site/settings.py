@@ -82,7 +82,7 @@ USE_I18N = True
 USE_TZ = True
 
 # 📂 Configurações de arquivos estáticos (CSS, JS, imagens fixas)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
@@ -98,13 +98,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirecionamento correto de login
 LOGIN_URL = '/login/'
 
-
-
-
-
-
-
-
-
-
-
+# Rota de Logout
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
