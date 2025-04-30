@@ -1,8 +1,12 @@
 {% extends 'cafeteria/base.html' %}
 {% load static %}
 
+
+<!-- Título da página -->
 {% block title %}Página Inicial - Loja de Café{% endblock %}
 
+
+<!-- Adicionando CSS específico para a página inicial -->
 {% block extra_css %}
 <link href="{% static 'css/home.css' %}" rel="stylesheet">
 {% endblock %}
@@ -12,8 +16,8 @@
 <!-- Banner principal -->
 <section class="text-center d-flex align-items-center justify-content-center" style="min-height: 90vh;width: 100%;color: white;">
     <div class="container text-white">
-        <h1 class="display-3 fw-bold">Bem-vindo à nossa Cafeteria</h1> <!-- display-3 = fonte grande -->
-        <p class="lead">O melhor café artesanal, servido com amor ☕</p>
+        <h1 class="display-3 fw-bold">Bem-vindo ao The Best Coffe</h1> <!-- display-3 = fonte grande -->
+        <p class="lead">O melhor café artesanal, servido com Dedicação e Paixão</p>
         <a href="{% url 'lista_produtos' %}" class="btn btn-outline-light btn-lg mt-3">Ver Cardápio</a>
     </div>
 </section>
@@ -26,7 +30,7 @@
         <p class="lead" style="max-width: 900px; margin: auto; color: #fff;">
             Fundada em 2023, nossa cafeteria nasceu da paixão por cafés especiais e bons momentos. 
             Cada grão é selecionado a dedo para trazer um sabor inesquecível em cada xícara. 
-            Venha viver uma experiência única conosco! ☕
+            Venha viver uma experiência única conosco!
         </p>
     </div>
 </section>
