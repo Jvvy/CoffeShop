@@ -1,0 +1,11 @@
+main{
+    background: linear-gradient(rgba(45, 32, 21, 0.6), rgba(45, 32, 21, 0.6)),
+    url(../imagens/banner-cafe-clean.jpg) no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;}
+
+h2{
+    color: #fff;
+    font-size: 3rem;
+    text-align: center;
+    margin-top: 20px;}
