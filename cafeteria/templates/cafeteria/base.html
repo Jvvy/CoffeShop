@@ -22,9 +22,9 @@
 <body style="font-family: 'Poppins', sans-serif;">
 
     <!-- Navbar fixa no topo -->
-    <nav class="navbar navbar-expand-lg navbar-dark top" style="background-color: black;">
+    <nav class="navbar navbar-expand-lg navbar-dark top" style="background-color: black;padding: 23px;">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">The Best Coffe</a>
+            <a class="navbar-brand" style="font-size:30px" href="{% url 'home' %}">The Best Coffe</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -33,27 +33,27 @@
                 <ul class="navbar-nav">
 
                     <li class="nav-item" >
-                        <a class="nav-link" style = "color: #fff;" href="{% url 'home' %}">Início</a>
+                        <a class="nav-link" style = "color: #fff; font-size:20px" href="{% url 'home' %}">Início</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" style = "color: #fff;" href="{% url 'lista_produtos' %}">Cardápio</a>
+                        <a class="nav-link" style = "color: #fff; font-size:20px" href="{% url 'lista_produtos' %}">Cardápio</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <span class="nav-link disabled" style = "color: #fff;">Olá, {{ user.username }}</span>
+                            <span class="nav-link disabled" style = "color: #fff; font-size:20px">Olá, {{ user.username }}</span>
                         </li>
                         <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="nav-link btn btn-outline-danger ms-2" style="border: none; background: none;">Sair</button>
+                                <button type="submit" class="nav-link btn btn-outline-danger ms-2" style="border: none; background: none;color: #fff; font-size:20px">Sair</button>
                             </form>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" style = "color: #fff;" href="{% url 'login' %}">Entrar</a>
+                            <a class="nav-link" style = "color: #fff; font-size:20px" href="{% url 'login' %}">Entrar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" style = "color: #fff;" href="{% url 'registro' %}">Registrar</a>
+                            <a class="nav-link" style = "color: #fff; font-size:20px" href="{% url 'registro' %}">Registrar</a>
                         </li>
                     {% endif %}
 
@@ -69,7 +69,7 @@
     </main>
 
     <!-- Rodapé -->
-    <footer class="text-white text-center py-3" style="background-color: black;">
+    <footer class="text-white text-center py-3" style="background-color: black; font-size:20px">
         <div class="container">
             <p>&copy; 2025 Loja de Café | contato@coffebest.com</p>
         </div>
