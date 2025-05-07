@@ -4,29 +4,82 @@
 
 {% block content %}
 <div class="container mt-5 mb-5">
-<h2 class="text-center mb-4">☕ Nosso Cardápio</h2>
+    <h2 class="text-center mb-4">☕ Nosso Cardápio</h2>
 
-<div class="row">
-    {% for produto in produtos %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                {% if produto.imagem %}
-                    <img src="{{ produto.imagem.url }}" class="card-img-top" alt="{{ produto.nome }}">
-                {% endif %}
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ produto.nome }}</h5>
-                    <p class="card-text">R$ {{ produto.preco }}</p>
-                    <div class="mt-auto">
-                        <a href="#" class="btn btn-success w-100">Adicionar ao Carrinho</a>
+    <div class="row">
+        {% for produto in produtos %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if produto.imagem %}
+                        <img src="{{ produto.imagem.url }}" class="card-img-top" alt="{{ produto.nome }}">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ produto.nome }}</h5>
+                        <p class="card-text">R$ {{ produto.preco }}</p>
+                        
+                        <form class="form-adicionar" data-id="{{ produto.id }}">
+                            {% csrf_token %}
+                            <div class="input-group mt-2">
+                                <input type="number" name="quantidade" value="1" min="1" class="form-control" style="max-width: 80px;">
+                                <button type="submit" class="btn btn-outline-primary">Adicionar</button>
+                            </div>
+                        </form>
+
+
                     </div>
                 </div>
             </div>
-        </div>
-    {% empty %}
-        <div class="col-12 text-center">
-            <p class="text-muted">Nenhum produto cadastrado ainda.</p>
-        </div>
-    {% endfor %}
-</div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Nenhum produto cadastrado ainda.</p>
+            </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
+
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.form-adicionar').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+    
+            const produtoId = this.dataset.id;
+            const quantidade = this.querySelector('input[name="quantidade"]').value;
+            const csrfToken = this.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    
+            fetch(`/adicionar/${produtoId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ quantidade })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const alertBox = document.createElement('div');
+                alertBox.className = 'alert alert-success mt-3 text-center';
+                alertBox.innerText = data.mensagem || data.erro;
+                this.parentElement.appendChild(alertBox);
+    
+                // Atualiza número da badge do carrinho
+                fetch('/quantidade-carrinho/')
+                .then(res => res.json())
+                .then(info => {
+                    const badge = document.getElementById('badge-carrinho');
+                    if (badge) {
+                        badge.textContent = info.total;
+                    }
+                });
+    
+                setTimeout(() => alertBox.remove(), 3000);
+            });
+        });
+    });
+    </script>
+    
+{% endblock %}
+
