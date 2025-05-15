@@ -28,4 +28,6 @@ urlpatterns = [
     # URL para atualizar a quantidade de produtos no carrinho ...:
     path('quantidade-carrinho/', views.quantidade_carrinho, name='quantidade_carrinho'),
 
+    # URL para finalizar o pedido ...:
+    path('finalizar/', views.finalizar_pedido, name='finalizar_pedido'),
 ]

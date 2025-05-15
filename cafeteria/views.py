@@ -4,7 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Produto
+from .models import Produto,Pedido, ItemPedido
+from django.contrib import messages
 
 # View Home
 def home(request):
@@ -13,7 +14,7 @@ def home(request):
 # Criação da View Produto ...:
 def lista_produtos(request):
     produtos = Produto.objects.all()
-    return render(request, 'cafeteria/lista.html', {'produtos': produtos})
+    return render(request, 'cafeteria/cardapio.html', {'produtos': produtos})
 
 
 # Criação de View Usuario Registro ...:
@@ -34,7 +35,7 @@ def registrar_usuario(request):
 def lista_produtos(request):
     # só acessa se estiver logado
     produtos = Produto.objects.all()
-    return render(request, 'cafeteria/lista.html', {'produtos': produtos})
+    return render(request, 'cafeteria/cardapio.html', {'produtos': produtos})
 
 
 
@@ -84,3 +85,47 @@ def quantidade_carrinho(request):
     carrinho = request.session.get('carrinho', {})
     total = sum(carrinho.values())
     return JsonResponse({'total': total})
+
+
+
+# Finaliza o pedido
+def finalizar_pedido(request):
+    carrinho = request.session.get('carrinho', {})
+
+    if not carrinho:
+        messages.error(request, "Seu carrinho está vazio.")
+        return redirect('lista_produtos')
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        endereco = request.POST.get('endereco')
+
+        pedido = Pedido.objects.create(nome=nome, endereco=endereco)
+
+        for produto_id, quantidade in carrinho.items():
+            produto = Produto.objects.get(id=produto_id)
+            ItemPedido.objects.create(
+                pedido=pedido,
+                produto=produto,
+                quantidade=quantidade,
+                preco=produto.preco
+            )
+
+        messages.success(request, f"Pedido #{pedido.id} realizado com sucesso!")
+        request.session['carrinho'] = {}
+        return redirect('lista_produtos')  # <-- DEVE estar dentro do POST
+
+    # Se for GET, exibe o formulário com resumo
+    itens = []
+    total = 0
+    for produto_id, quantidade in carrinho.items():
+        produto = Produto.objects.get(id=produto_id)
+        subtotal = produto.preco * quantidade
+        total += subtotal
+        itens.append({
+            'produto': produto,
+            'quantidade': quantidade,
+            'subtotal': subtotal
+        })
+
+    return render(request, 'cafeteria/finalizar.html', {'itens': itens, 'total': total})
