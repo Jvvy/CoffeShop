@@ -76,6 +76,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Configurações de autenticação ...:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Idioma e horário
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'

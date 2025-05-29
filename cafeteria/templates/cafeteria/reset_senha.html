@@ -1,0 +1,16 @@
+{% extends 'cafeteria/base.html' %}
+{% block title %}Redefinir Senha{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">🔐 Redefinir sua Senha</h2>
+    <p class="text-center">Informe seu e-mail para receber um link de redefinição de senha.</p>
+    <form method="post" class="card p-4 shadow mx-auto" style="max-width: 500px;">
+        {% csrf_token %}
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        <div class="text-end mt-3">
+            <button type="submit" class="btn btn-dark">Enviar Link</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

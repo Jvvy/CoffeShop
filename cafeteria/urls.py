@@ -30,4 +30,12 @@ urlpatterns = [
 
     # URL para finalizar o pedido ...:
     path('finalizar/', views.finalizar_pedido, name='finalizar_pedido'),
+
+    # URL para redefinir a senha ...:
+    path('resetar-senha/', auth_views.PasswordResetView.as_view(template_name='cafeteria/reset_senha.html'), name='password_reset'),
+    path('resetar-senha/enviado/', auth_views.PasswordResetDoneView.as_view(template_name='cafeteria/reset_enviado.html'), name='password_reset_done'),
+    path('resetar-senha/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='cafeteria/reset_confirmar.html'), name='password_reset_confirm'),
+    path('resetar-senha/feito/', auth_views.PasswordResetCompleteView.as_view(template_name='cafeteria/reset_completo.html'), name='password_reset_complete'),
+
+
 ]
