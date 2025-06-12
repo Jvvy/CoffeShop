@@ -26,24 +26,44 @@
                             <span>R$ {{ item.subtotal }}</span>
                         </li>
                     {% endfor %}
+                    {% if tipo_entrega == 'delivery' %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            Taxa de Entrega:
+                            <span>R$ 10.00</span>
+                        </li>
+                    {% endif %}
                     <li class="list-group-item d-flex justify-content-between fw-bold">
                         Total:
-                        <span>R$ {{ total }}</span>
+                        <span>R$ {{ total_com_taxa }}</span>
                     </li>
                 </ul>
             </div>
 
             <!-- Formulário de Finalização -->
-            <form method="post" class="card p-4 shadow">
+            <form method="post" class="card p-4 shadow" id="form-finalizar">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome Completo</label>
                     <input type="text" name="nome" class="form-control" required>
                 </div>
+
                 <div class="mb-3">
-                    <label for="endereco" class="form-label">Endereço de Entrega</label>
-                    <textarea name="endereco" class="form-control" rows="3" required></textarea>
+                    <label for="cpf" class="form-label">CPF</label>
+                    <input type="text" name="cpf" class="form-control" placeholder="Somente números" required>
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Forma de Entrega</label>
+                    <select name="tipo_entrega" class="form-select" id="tipo_entrega" required>
+                        <option value="retirada">Retirada no Local</option>
+                        <option value="delivery">Tele Entrega (+R$10,00)</option>
+                    </select>
+                </div>
+                <div class="mb-3" id="campo_endereco" style="display: none;">
+                    <label for="endereco" class="form-label">Endereço de Entrega</label>
+                    <textarea name="endereco" class="form-control" rows="3"></textarea>
+                </div>
+
                 <div class="text-end">
                     <button type="submit" class="btn btn-success">Finalizar Pedido</button>
                     <a href="{% url 'ver_carrinho' %}" class="btn btn-outline-secondary">Voltar ao Carrinho</a>
@@ -55,4 +75,22 @@
         <div class="alert alert-info text-center">Seu carrinho está vazio.</div>
     {% endif %}
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectEntrega = document.getElementById('tipo_entrega');
+        const campoEndereco = document.getElementById('campo_endereco');
+
+        selectEntrega.addEventListener('change', function () {
+            if (this.value === 'delivery') {
+                campoEndereco.style.display = 'block';
+                campoEndereco.querySelector('textarea').setAttribute('required', 'required');
+            } else {
+                campoEndereco.style.display = 'none';
+                campoEndereco.querySelector('textarea').removeAttribute('required');
+            }
+        });
+    });
+</script>
+
 {% endblock %}

@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'sua-secret-key-aqui'
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -81,8 +80,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jv.cl2017@gmail.com'
-EMAIL_HOST_PASSWORD = 'pcwr ezca phsc gggo'
+EMAIL_HOST_USER = 'jv.cl2017@gmail.com' # Mudar aqui colcoar com hash
+EMAIL_HOST_PASSWORD = 'pcwr ezca phsc gggo' # Mudar aqui colcoar com hash
 
 
 # Idioma e horário
@@ -111,3 +110,12 @@ LOGIN_URL = '/login/'
 # Rota de Logout
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
+
+
+# Configurações de segurança ...:
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '1b11-177-137-5-94.ngrok-free.app'  # <-- coloque seu domínio do ngrok aqui
+    
+]
