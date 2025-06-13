@@ -13,38 +13,38 @@
             </div>
 
             <h5 class="text-center">Ou copie o código:</h5>
-            <div class="alert alert-secondary text-center">
-                <code style="word-break: break-all;">{{ pix_copia_cola }}</code>
-            </div>
+            <textarea id="pixCode" class="form-control mb-2" rows="3" readonly>{{ pix_copia_cola }}</textarea>
+            <button class="btn btn-outline-primary btn-sm" onclick="copiarPix()">📋 Copiar Código</button>
 
-            <div class="text-center">
+            <div class="text-center mt-4">
                 <a href="/" class="btn btn-success">Voltar para o Início</a>
             </div>
         </div>
     </div>
 </div>
 
-
 <script>
-    setInterval(function () {
+    function verificarPagamento() {
         fetch("{% url 'verificar_status_pagamento' pedido_id=pedido_id %}")
             .then(response => response.json())
             .then(data => {
                 if (data.pago) {
                     window.location.href = "{% url 'pagamento_sucesso' %}";
+                } else {
+                    setTimeout(verificarPagamento, 5000);
                 }
             });
-    }, 5000); // a cada 5 segundos
+    }
+    setTimeout(verificarPagamento, 5000);
 </script>
 
-
 <script>
-function copiarPix() {
-    const input = document.getElementById('pixCode');
-    input.select();
-    input.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(input.value);
-    alert('Código PIX copiado!');
-}
+    function copiarPix() {
+        const input = document.getElementById('pixCode');
+        input.select();
+        input.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(input.value);
+        alert('Código PIX copiado!');
+    }
 </script>
 {% endblock %}

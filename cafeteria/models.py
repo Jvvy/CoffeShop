@@ -8,7 +8,6 @@ class Pedido(models.Model):
     endereco = models.TextField()
     data = models.DateTimeField(auto_now_add=True)
     pago = models.BooleanField(default=False)
-
     asaas_id = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):

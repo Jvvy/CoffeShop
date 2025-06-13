@@ -2,19 +2,21 @@ from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.http import JsonResponse
-from .models import Produto, Pedido, ItemPedido
 from django.contrib import messages
+from django.http import HttpResponse
 from datetime import date
+from .models import Produto, Pedido, ItemPedido
 from django.views.decorators.csrf import csrf_exempt
 from io import BytesIO
 from decimal import Decimal
 import qrcode
 import base64
 import requests
-from django.http import HttpResponse
+import threading
 import json
-
+import time
 
 
 # View Home
@@ -158,8 +160,13 @@ def finalizar_pedido(request):
 
         try:
             pagamento = cobranca_resp.json()
-            payment_id = pagamento.get("id")
             pix_copia_cola = pagamento.get("pixCopyPaste") or pagamento.get("invoiceUrl")
+            payment_id = pagamento.get("id")
+
+            if settings.DEBUG and payment_id:
+                threading.Thread(target=simular_pagamento_automaticamente, args=(payment_id, pedido.id)).start()
+
+
 
             # Salva o asaas_id no pedido
             pedido.asaas_id = payment_id
@@ -206,21 +213,36 @@ def finalizar_pedido(request):
         'tipo_entrega': request.GET.get('tipo_entrega', 'retirada')
     })
 
+# Simula o pagamento automático após 5 segundos ...:
+def simular_pagamento_automaticamente(payment_id, pedido_id):
+    time.sleep(5)
+    url = f"https://sandbox.asaas.com/api/v3/payments/{payment_id}/receiveInCash"
+    headers = {
+        "Content-Type": "application/json",
+        "access_token": "$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmE4MDdhNWJiLWM1ZTktNGFhZi04MzlkLTE1NDYwZjY5YjgwZjo6JGFhY2hfYTA2MjM5NmItNzUwMi00MTU0LWIyODQtZjE5YTI4NmZlMDRm"}
+
+    dados_pagamento = {
+        "paymentDate": str(date.today()),
+        "value": 10.00  # ou total real
+    }
+
+    response = requests.post(url, headers=headers, json=dados_pagamento)
+    print("Simulação automática:", response.status_code, response.text)
+
+    # ✅ Atualiza o pedido localmente
+    from .models import Pedido
+    try:
+        pedido = Pedido.objects.get(id=pedido_id)
+        pedido.pago = True
+        pedido.save()
+        print("Pagamento atualizado no banco local.")
+    except Pedido.DoesNotExist:
+        print("Pedido não encontrado para marcar como pago.")
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+# Verifica o status do pagamento do pedido ...:
 @login_required
 def verificar_status_pagamento(request, pedido_id):
     try:
@@ -234,24 +256,28 @@ def verificar_status_pagamento(request, pedido_id):
 # Webhook para receber notificações do Asaas ...:
 @csrf_exempt
 def asaas_webhook(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         payload = json.loads(request.body)
+        event = payload.get('event')
+        payment_id = payload.get('payment', {}).get('id')
+        status = payload.get('payment', {}).get('status')
 
-        if payload.get("event") == "PAYMENT_RECEIVED":
-            payment_id = payload.get("payment", {}).get("id")
+        print(f"Evento: {event}")
+        print(f"Pagamento ID: {payment_id}")
+        print(f"Status: {status}")
 
-            # encontre o pedido com base no ID externo (por ex, invoiceNumber, ou salve o ID no pedido)
+        if status in ['RECEIVED', 'RECEIVED_IN_CASH']:
             try:
-                pedido = Pedido.objects.get(asaas_id=payment_id)  # Ex: você salvou esse ID no pedido
+                pedido = Pedido.objects.get(asaas_id=payment_id)
                 pedido.pago = True
                 pedido.save()
-                print(f"✅ Pagamento confirmado para o pedido #{pedido.id}")
+                print("Pedido atualizado como pago.")
             except Pedido.DoesNotExist:
-                print("❌ Pedido não encontrado para o pagamento:", payment_id)
+                print("Pedido não encontrado.")
+        return HttpResponse(status=200)
+    return HttpResponse(status=405)
 
-        return JsonResponse({"status": "ok"})
 
-    return HttpResponse("Webhook OK")
 
 def pagamento_sucesso(request):
     return render(request, 'cafeteria/pagamento_sucesso.html')
