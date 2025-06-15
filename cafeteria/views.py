@@ -1,4 +1,8 @@
+from .models import Produto, Pedido, ItemPedido
+from .forms import RegistroForm
+from .models import Perfil
 from django.shortcuts import render, redirect , get_object_or_404
+from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -6,17 +10,25 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.contrib import messages
 from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
 from datetime import date
-from .models import Produto, Pedido, ItemPedido
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 from io import BytesIO
 from decimal import Decimal
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import qrcode
 import base64
 import requests
 import threading
 import json
 import time
+from datetime import datetime
+
+
+
 
 
 # View Home
@@ -32,14 +44,35 @@ def lista_produtos(request):
 # Criação de View Usuario Registro ...:
 def registrar_usuario(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistroForm(request.POST)
         if form.is_valid():
-            usuario = form.save()
-            login(request, usuario)
+            user = form.save(commit=False)
+            user.email = form.cleaned_data['email']
+            user.save()
+
+            # Cria o perfil com os dados extras
+            Perfil.objects.create(
+                user=user,
+                nome=form.cleaned_data['nome'],
+                cpf=form.cleaned_data['cpf'],
+                data_nascimento=form.cleaned_data['data_nascimento'],
+                celular=form.cleaned_data['celular']
+            )
+
+            login(request, user)
             return redirect('/')
     else:
-        form = UserCreationForm()
+        form = RegistroForm()
     return render(request, 'cafeteria/registro.html', {'form': form})
+
+
+
+
+
+
+
+
+
 
 # Adiciona o produto ao carrinho ...:
 def adicionar_ao_carrinho(request, produto_id):
@@ -86,9 +119,44 @@ def quantidade_carrinho(request):
     return JsonResponse({'total': total})
 
 
+@require_POST
+def alterar_quantidade(request, produto_id):
+    try:
+        nova_quantidade = int(request.POST.get('quantidade'))
+        if nova_quantidade < 1:
+            return redirect('remover_do_carrinho', produto_id=produto_id)
+
+        carrinho = request.session.get('carrinho', {})
+        carrinho[str(produto_id)] = nova_quantidade
+        request.session['carrinho'] = carrinho
+        return redirect('ver_carrinho')
+
+    except (ValueError, TypeError):
+        return HttpResponseBadRequest("Quantidade inválida")
 
 
-# Finaliza o pedido e integra com Asaas PIX
+
+
+def enviar_email_confirmacao(pedido, user_email):
+    assunto = f"Pedido #{pedido.id} confirmado - The Best Coffee"
+    contexto = {
+        'pedido': pedido,
+        'itens': pedido.itens.all(),
+    }
+
+    html_conteudo = render_to_string('cafeteria/email_confirmacao.html', contexto)
+    texto_conteudo = strip_tags(html_conteudo)
+
+    send_mail(
+        assunto,
+        texto_conteudo,
+        settings.EMAIL_HOST_USER,
+        [user_email],
+        html_message=html_conteudo
+    )
+
+
+# Finaliza o pedido com opção de pagamento em PIX ou Dinheiro
 @login_required
 def finalizar_pedido(request):
     carrinho = request.session.get('carrinho', {})
@@ -100,7 +168,11 @@ def finalizar_pedido(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
         tipo_entrega = request.POST.get('tipo_entrega')
-        endereco = request.POST.get('endereco') if tipo_entrega == 'delivery' else 'Retirada no local'
+        forma_pagamento = request.POST.get('forma_pagamento', 'pix')
+        rua = request.POST.get('rua') or ''
+        numero = request.POST.get('numero') or ''
+        complemento = request.POST.get('complemento') or ''
+        bairro = request.POST.get('bairro') or ''
         cpf = request.POST.get("cpf")
 
         total = Decimal('0.00')
@@ -112,8 +184,15 @@ def finalizar_pedido(request):
         if tipo_entrega == 'delivery':
             total += Decimal('10.00')
 
-        # Cria o pedido local (sem salvar ainda o asaas_id)
-        pedido = Pedido.objects.create(nome=nome, endereco=endereco)
+        pedido = Pedido.objects.create(
+            nome=nome,
+            rua=rua,
+            numero=numero,
+            complemento=complemento,
+            bairro=bairro,
+            valor_total=total,
+            tipo_entrega=tipo_entrega,
+        )
 
         for produto_id, quantidade in carrinho.items():
             produto = Produto.objects.get(id=produto_id)
@@ -124,7 +203,17 @@ def finalizar_pedido(request):
                 preco=produto.preco
             )
 
-        # Integração com Asaas
+        # 💵 Se o pagamento for em dinheiro, apenas salva o pedido e redireciona
+        if forma_pagamento == 'dinheiro':
+            pedido.pago = True
+            pedido.save()
+
+            enviar_email_confirmacao(pedido, request.user.email)
+
+            request.session['carrinho'] = {}
+            return redirect('pagamento_sucesso')
+
+        # 💳 Se for PIX, continua com integração Asaas
         headers = {
             "Content-Type": "application/json",
             "access_token": "$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmE4MDdhNWJiLWM1ZTktNGFhZi04MzlkLTE1NDYwZjY5YjgwZjo6JGFhY2hfYTA2MjM5NmItNzUwMi00MTU0LWIyODQtZjE5YTI4NmZlMDRm"
@@ -164,15 +253,22 @@ def finalizar_pedido(request):
             payment_id = pagamento.get("id")
 
             if settings.DEBUG and payment_id:
+                #threading.Thread(target=simular_pagamento_automaticamente, args=(payment_id, pedido.id)).start()
+                confirm_url = f"https://sandbox.asaas.com/api/v3/payments/{payment_id}/confirmPayment"
+                confirm_resp = requests.post(confirm_url, headers=headers)
+                print("Confirmação do pagamento:", confirm_resp.status_code, confirm_resp.text)
+                #input()
+
+                requests.post(confirm_url, headers=headers)
                 threading.Thread(target=simular_pagamento_automaticamente, args=(payment_id, pedido.id)).start()
 
 
 
-            # Salva o asaas_id no pedido
             pedido.asaas_id = payment_id
             pedido.save()
 
-            # Gera o QR Code em base64
+            enviar_email_confirmacao(pedido, request.user.email)
+
             qr_image = qrcode.make(pix_copia_cola)
             buffer = BytesIO()
             qr_image.save(buffer, format="PNG")
@@ -182,7 +278,6 @@ def finalizar_pedido(request):
             messages.error(request, "Erro inesperado ao processar o pagamento.")
             return redirect("ver_carrinho")
 
-        # Limpa o carrinho após gerar cobrança
         request.session['carrinho'] = {}
 
         return render(request, 'cafeteria/pagamento_pix.html', {
@@ -213,6 +308,7 @@ def finalizar_pedido(request):
         'tipo_entrega': request.GET.get('tipo_entrega', 'retirada')
     })
 
+
 # Simula o pagamento automático após 5 segundos ...:
 def simular_pagamento_automaticamente(payment_id, pedido_id):
     time.sleep(5)
@@ -229,8 +325,8 @@ def simular_pagamento_automaticamente(payment_id, pedido_id):
     response = requests.post(url, headers=headers, json=dados_pagamento)
     print("Simulação automática:", response.status_code, response.text)
 
-    # ✅ Atualiza o pedido localmente
-    from .models import Pedido
+
+    # Atualiza o pedido localmente ...:
     try:
         pedido = Pedido.objects.get(id=pedido_id)
         pedido.pago = True
@@ -238,8 +334,6 @@ def simular_pagamento_automaticamente(payment_id, pedido_id):
         print("Pagamento atualizado no banco local.")
     except Pedido.DoesNotExist:
         print("Pedido não encontrado para marcar como pago.")
-
-
 
 
 # Verifica o status do pagamento do pedido ...:
@@ -281,3 +375,65 @@ def asaas_webhook(request):
 
 def pagamento_sucesso(request):
     return render(request, 'cafeteria/pagamento_sucesso.html')
+
+
+
+
+
+@login_required
+def perfil_usuario(request):
+    try:
+        perfil = request.user.perfil
+    except ObjectDoesNotExist:
+        messages.warning(request, "Complete seu perfil antes de continuar.")
+        return redirect('registro')  # Ou crie uma página apropriada para criação do perfil
+
+    if request.method == 'POST':
+        perfil.nome = request.POST.get('nome')
+        perfil.cpf = request.POST.get('cpf')
+        perfil.celular = request.POST.get('celular')
+
+        data_str = request.POST.get('data_nascimento')
+        try:
+            perfil.data_nascimento = datetime.strptime(data_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            messages.error(request, "Data de nascimento inválida.")
+            return redirect('perfil_usuario')
+
+        perfil.save()
+
+        request.user.email = request.POST.get('email')
+        request.user.save()
+
+        messages.success(request, "Perfil atualizado com sucesso!")
+
+    return render(request, 'cafeteria/perfil.html', {'perfil': perfil})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

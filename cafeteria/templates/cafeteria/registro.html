@@ -2,23 +2,100 @@
 {% load static %}
 {% load form_filters %}
 
-{% block title %}Registrar - Loja de Café{% endblock %}
+{% block title %}Registrar - The Best Coffee{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;background-color:rgb(154, 160, 165));">
-    <div class="card p-4 shadow" style="width: 100%; max-width: 450px;">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 500px;">
         <h2 class="text-center mb-4" style="color: #6F4E37;">Criar Conta</h2>
-        <form method="post">
+        <form method="post" novalidate>
             {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field|add_class:"form-control" }}
-                </div>
-            {% endfor %}
+            {{ form.non_field_errors }}
+
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuário</label>
+                {{ form.username|add_class:"form-control" }}
+                <div class="form-text">Digite um nome de usuário (letras, números e @/./+/-/_).</div>
+                {% if form.username.errors %}
+                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                {{ form.email|add_class:"form-control" }}
+                {% if form.email.errors %}
+                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome Completo</label>
+                {{ form.nome|add_class:"form-control" }}
+                {% if form.nome.errors %}
+                    <div class="text-danger small">{{ form.nome.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF</label>
+                {{ form.cpf|add_class:"form-control" }}
+                {% if form.cpf.errors %}
+                    <div class="text-danger small">{{ form.cpf.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                {{ form.data_nascimento|add_class:"form-control" }}
+                {% if form.data_nascimento.errors %}
+                    <div class="text-danger small">{{ form.data_nascimento.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="celular" class="form-label">Celular</label>
+                {{ form.celular|add_class:"form-control" }}
+                {% if form.celular.errors %}
+                    <div class="text-danger small">{{ form.celular.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="password1" class="form-label">Senha</label>
+                {{ form.password1|add_class:"form-control" }}
+                {% if form.password1.help_text %}
+                    <div class="form-text text-muted">{{ form.password1.help_text|safe }}</div>
+                {% endif %}
+                {% if form.password1.errors %}
+                    <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="password2" class="form-label">Confirmação da Senha</label>
+                {{ form.password2|add_class:"form-control" }}
+                {% if form.password2.errors %}
+                    <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
             <button type="submit" class="btn btn-dark w-100">Registrar</button>
         </form>
+
         <p class="text-center mt-3">Já tem uma conta? <a href="{% url 'login' %}">Entrar</a></p>
     </div>
 </div>
+{% endblock %}
+
+<!-- MÁSCARAS: CPF e Celular -->
+{% block extra_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#id_cpf').mask('000.000.000-00');
+            $('#id_celular').mask('(00) 00000-0000');
+        });
+    </script>
 {% endblock %}

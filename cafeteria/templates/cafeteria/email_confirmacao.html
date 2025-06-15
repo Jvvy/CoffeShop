@@ -1,0 +1,24 @@
+<h2>☕ Pedido Confirmado - The Best Coffee</h2>
+<p>Olá {{ pedido.nome }},</p>
+
+<p>Obrigado por seu pedido! Aqui estão os detalhes:</p>
+
+<h4>📦 Itens:</h4>
+<ul>
+    {% for item in itens %}
+        <li>{{ item.quantidade }}x {{ item.produto.nome }} - R$ {{ item.preco }}</li>
+    {% endfor %}
+</ul>
+
+<p><strong>💰 Total:</strong> R$ {{ pedido.valor_total }}</p>
+
+{% if pedido.tipo_entrega == 'delivery' %}
+    <p><strong>🚚 Entrega para:</strong><br>
+        Rua {{ pedido.rua }}, nº {{ pedido.numero }}{% if pedido.complemento %}, {{ pedido.complemento }}{% endif %}, {{ pedido.bairro }}
+    </p>
+{% else %}
+    <p><strong>🛍️ Retirada no balcão.</strong></p>
+{% endif %}
+
+<p>Qualquer dúvida, estamos à disposição.</p>
+<p>Equipe The Best Coffee ☕</p>

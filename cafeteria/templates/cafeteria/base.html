@@ -18,6 +18,7 @@
 
         <!-- CSS Personalizado -->
         {% block extra_css %}{% endblock %}
+        {% block extra_scripts %}{% endblock %}
 
 
     </head>
@@ -50,6 +51,8 @@
                             <li class="nav-item">
                                 <span class="nav-link disabled" style = "color: #fff; font-size:20px">Olá, {{ user.username }}</span>
                             </li>
+
+                            
                             <li class="nav-item">
                                 <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
@@ -68,6 +71,12 @@
 
                                 </a>
                             </li>
+
+                            <!--Nav Perfil do Usuário-->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'perfil_usuario' %}">Perfil</a>
+                            </li>
+
                         
                         <!-- Nav Login e registro -->
                         {% else %}

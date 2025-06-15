@@ -3,6 +3,7 @@ from django.contrib.auth import views as auth_views
 from .views import registrar_usuario,lista_produtos,home
 from . import views
 from cafeteria.views import asaas_webhook
+from cafeteria.forms import LoginEmailOuUsuarioForm
 
 
 urlpatterns = [
@@ -16,9 +17,9 @@ urlpatterns = [
    
    
     # URL para Login e Logout ...:
-    path('login/', auth_views.LoginView.as_view(template_name='cafeteria/login.html'), name='login'),
+    path('login/', auth_views.LoginView.as_view(template_name='cafeteria/login.html',authentication_form=LoginEmailOuUsuarioForm), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    
+
 
     # URL para Registro de Usuário ...:
     path('registro/', registrar_usuario, name='registro'),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('adicionar/<int:produto_id>/', views.adicionar_ao_carrinho, name='adicionar_ao_carrinho'),
     path('carrinho/', views.ver_carrinho, name='ver_carrinho'),
     path('remover/<int:produto_id>/', views.remover_do_carrinho, name='remover_do_carrinho'),
+    path('alterar-quantidade/<int:produto_id>/', views.alterar_quantidade, name='alterar_quantidade'),
 
 
     # URL para atualizar a quantidade de produtos no carrinho ...:
@@ -52,5 +54,9 @@ urlpatterns = [
     # URL para verificar o status do pagamento ...:
     path('verificar-status/<int:pedido_id>/', views.verificar_status_pagamento, name='verificar_status_pagamento'),
     path('pagamento-sucesso/', views.pagamento_sucesso, name='pagamento_sucesso'),
+
+
+    # URL para o perfil do usuário ...:
+    path('perfil/', views.perfil_usuario, name='perfil_usuario'),
 
 ]

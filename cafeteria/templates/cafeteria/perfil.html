@@ -1,0 +1,60 @@
+{% extends 'cafeteria/base.html' %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">👤 Meu Perfil</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Nome</label>
+            <input type="text" name="nome" class="form-control" value="{{ perfil.nome }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="{{ request.user.email }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">CPF</label>
+            <input type="text" name="cpf" class="form-control" value="{{ perfil.cpf }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Data de Nascimento</label>
+            <input type="date" name="data_nascimento" class="form-control" value="{{ perfil.data_nascimento|date:'Y-m-d' }}" required>
+
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Celular</label>
+            <input type="text" name="celular" class="form-control" value="{{ perfil.celular }}" required>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block extra_scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('input[name="cpf"]').mask('000.000.000-00');
+            $('input[name="celular"]').mask('(00) 00000-0000');
+        });
+    </script>
+{% endblock %}

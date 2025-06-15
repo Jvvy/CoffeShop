@@ -1,0 +1,26 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-15 13:02-0300\n"
+"PO-Revision-Date: 2025-06-15 13:05-0300\n"
+"Last-Translator: João Vitor <jv.cl2017@gmail.com>\n"
+"Language-Team: Portuguese (Brazil)\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: django/contrib/auth/password_validation.py:134
+msgid "This password is too short. It must contain at least 8 characters."
+msgstr "A senha é muito curta. Ela deve conter pelo menos 8 caracteres."
+
+#: cafeteria/forms.py:26
+msgid "Usuário ou senha inválidos."
+msgstr "Usuário ou senha inválidos."
