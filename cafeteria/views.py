@@ -28,9 +28,6 @@ import time
 from datetime import datetime
 
 
-
-
-
 # View Home
 def home(request):
     return render(request, 'cafeteria/home.html')
@@ -64,14 +61,6 @@ def registrar_usuario(request):
     else:
         form = RegistroForm()
     return render(request, 'cafeteria/registro.html', {'form': form})
-
-
-
-
-
-
-
-
 
 
 # Adiciona o produto ao carrinho ...:
@@ -165,15 +154,23 @@ def finalizar_pedido(request):
         messages.error(request, "Seu carrinho está vazio.")
         return redirect('lista_produtos')
 
+    # Puxa dados perfil do usuário logado, se existir ...:
+    perfil = getattr(request.user, 'perfil', None)
+
+
     if request.method == 'POST':
-        nome = request.POST.get('nome')
         tipo_entrega = request.POST.get('tipo_entrega')
         forma_pagamento = request.POST.get('forma_pagamento', 'pix')
         rua = request.POST.get('rua') or ''
         numero = request.POST.get('numero') or ''
         complemento = request.POST.get('complemento') or ''
         bairro = request.POST.get('bairro') or ''
-        cpf = request.POST.get("cpf")
+
+        # Pega os dados do perfil
+        perfil = request.user.perfil
+        nome = perfil.nome
+        cpf = perfil.cpf
+        celular = perfil.celular
 
         total = Decimal('0.00')
         for produto_id, quantidade in carrinho.items():
@@ -185,7 +182,10 @@ def finalizar_pedido(request):
             total += Decimal('10.00')
 
         pedido = Pedido.objects.create(
+            user=request.user,
             nome=nome,
+            cpf=cpf,
+            celular=celular,
             rua=rua,
             numero=numero,
             complemento=complemento,
@@ -203,7 +203,7 @@ def finalizar_pedido(request):
                 preco=produto.preco
             )
 
-        # 💵 Se o pagamento for em dinheiro, apenas salva o pedido e redireciona
+        # PAGAMENTO EM DINHEIRO
         if forma_pagamento == 'dinheiro':
             pedido.pago = True
             pedido.save()
@@ -213,7 +213,7 @@ def finalizar_pedido(request):
             request.session['carrinho'] = {}
             return redirect('pagamento_sucesso')
 
-        # 💳 Se for PIX, continua com integração Asaas
+        # PAGAMENTO VIA PIX
         headers = {
             "Content-Type": "application/json",
             "access_token": "$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmE4MDdhNWJiLWM1ZTktNGFhZi04MzlkLTE1NDYwZjY5YjgwZjo6JGFhY2hfYTA2MjM5NmItNzUwMi00MTU0LWIyODQtZjE5YTI4NmZlMDRm"
@@ -252,32 +252,23 @@ def finalizar_pedido(request):
             pix_copia_cola = pagamento.get("pixCopyPaste") or pagamento.get("invoiceUrl")
             payment_id = pagamento.get("id")
 
-            if settings.DEBUG and payment_id:
-                #threading.Thread(target=simular_pagamento_automaticamente, args=(payment_id, pedido.id)).start()
-                confirm_url = f"https://sandbox.asaas.com/api/v3/payments/{payment_id}/confirmPayment"
-                confirm_resp = requests.post(confirm_url, headers=headers)
-                print("Confirmação do pagamento:", confirm_resp.status_code, confirm_resp.text)
-                #input()
-
-                requests.post(confirm_url, headers=headers)
-                threading.Thread(target=simular_pagamento_automaticamente, args=(payment_id, pedido.id)).start()
-
-
-
             pedido.asaas_id = payment_id
             pedido.save()
 
             enviar_email_confirmacao(pedido, request.user.email)
 
+            # Gera QR Code em base64
             qr_image = qrcode.make(pix_copia_cola)
             buffer = BytesIO()
             qr_image.save(buffer, format="PNG")
             qr_code_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-        except ValueError:
-            messages.error(request, "Erro inesperado ao processar o pagamento.")
+        except Exception as e:
+            print("Erro ao processar cobrança:", cobranca_resp.text)
+            messages.error(request, "Erro ao gerar cobrança PIX.")
             return redirect("ver_carrinho")
 
+        # Limpa o carrinho após criar a cobrança
         request.session['carrinho'] = {}
 
         return render(request, 'cafeteria/pagamento_pix.html', {
@@ -300,13 +291,21 @@ def finalizar_pedido(request):
         })
 
     total_com_taxa = total + Decimal('10.00') if request.GET.get('tipo_entrega') == 'delivery' else total
+    nome_inicial = perfil.nome if perfil else ''
+    cpf_inicial = perfil.cpf if perfil else ''
 
     return render(request, 'cafeteria/finalizar.html', {
         'itens': itens,
         'total': total,
         'total_com_taxa': total_com_taxa,
-        'tipo_entrega': request.GET.get('tipo_entrega', 'retirada')
+        'tipo_entrega': request.GET.get('tipo_entrega', 'retirada'),
+        'nome_inicial': nome_inicial,
+        'cpf_inicial': cpf_inicial,
+
+
     })
+
+
 
 
 # Simula o pagamento automático após 5 segundos ...:
@@ -351,32 +350,38 @@ def verificar_status_pagamento(request, pedido_id):
 @csrf_exempt
 def asaas_webhook(request):
     if request.method == 'POST':
-        payload = json.loads(request.body)
-        event = payload.get('event')
-        payment_id = payload.get('payment', {}).get('id')
-        status = payload.get('payment', {}).get('status')
+        try:
+            payload = json.loads(request.body)
+            event = payload.get('event')
+            payment_id = payload.get('payment', {}).get('id')
+            status = payload.get('payment', {}).get('status')
+        
+            print(f"Evento: {event}")
+            print(f"Pagamento ID: {payment_id}")
+            print(f"Status: {status}")
 
-        print(f"Evento: {event}")
-        print(f"Pagamento ID: {payment_id}")
-        print(f"Status: {status}")
+            if status in ['RECEIVED', 'RECEIVED_IN_CASH']:
+                try:
+                    pedido = Pedido.objects.get(asaas_id=payment_id)
+                    pedido.pago = True
+                    pedido.save()
+                    print("Pedido atualizado como pago.")
+                except Pedido.DoesNotExist:
+                    print("Pedido não encontrado.")
 
-        if status in ['RECEIVED', 'RECEIVED_IN_CASH']:
-            try:
-                pedido = Pedido.objects.get(asaas_id=payment_id)
-                pedido.pago = True
-                pedido.save()
-                print("Pedido atualizado como pago.")
-            except Pedido.DoesNotExist:
-                print("Pedido não encontrado.")
-        return HttpResponse(status=200)
+            # SEMPRE retornar 200 OK para o Asaas
+            return HttpResponse(status=200)
+
+        except Exception as e:
+            print("Erro no webhook:", e)
+            return HttpResponse(status=400)
+
     return HttpResponse(status=405)
 
 
 
 def pagamento_sucesso(request):
     return render(request, 'cafeteria/pagamento_sucesso.html')
-
-
 
 
 

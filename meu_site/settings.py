@@ -1,15 +1,17 @@
 import os
 from pathlib import Path
 
+
 # Base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 # Segurança
 SECRET_KEY = 'sua-secret-key-aqui'
 DEBUG = True
 
 
-# Aplicações instaladas
+# Aplicações instaladas ...:
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,9 +19,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cafeteria',  # sua app de cafeteria
+    'cafeteria',  # App Adicionado ...:
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -33,6 +36,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'meu_site.urls'
 
+
+# Configuração dos templates ...:
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -50,7 +55,9 @@ TEMPLATES = [
     },
 ]
 
+# Configuração do WSGI (Web Server Gateway Interface) ...:
 WSGI_APPLICATION = 'meu_site.wsgi.application'
+
 
 # Banco de dados
 DATABASES = {
@@ -60,7 +67,7 @@ DATABASES = {
     }
 }
 
-# Validações de senha
+# Validações de senha (Gambi na Mão para mudar a mensagem) ...:
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -88,31 +95,32 @@ EMAIL_HOST_USER = 'jv.cl2017@gmail.com' # Mudar aqui colcoar com hash
 EMAIL_HOST_PASSWORD = 'pcwr ezca phsc gggo' # Mudar aqui colcoar com hash
 
 
-# Idioma e horário
+# Idioma e horário ...:
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# 📂 Configurações de arquivos estáticos (CSS, JS, imagens fixas)
+# Configurações de arquivos estáticos (CSS, JS, imagens fixas) ...:
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# 📂 Configurações de arquivos enviados pelos usuários (imagens, uploads)
+
+#  Configurações de arquivos enviados pelos usuários (imagens, uploads) ...:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Padrão para chaves primárias
+
+# Padrão para chaves primárias ...:
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Redirecionamento correto de login
+# Redirecionamento correto de login ...:
 LOGIN_URL = '/login/'
 
-# Rota de Logout
+
+# Rota de Logout ...:
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 
@@ -121,6 +129,6 @@ LOGIN_REDIRECT_URL = '/'
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
-    '1b11-177-137-5-94.ngrok-free.app'  # <-- coloque seu domínio do ngrok aqui
+    'e82c-177-137-5-94.ngrok-free.app'
     
 ]

@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container mt-5 text-center">
-    <h2 class="mb-4">💳 Pagamento via PIX</h2>
+    <h2 class="mb-4">Pagamento via PIX</h2>
     <p class="lead">Escaneie o QR Code abaixo com seu aplicativo bancário para concluir o pagamento:</p>
     <div class="card mx-auto shadow" style="max-width: 400px;">
         <div class="card-body">
@@ -14,7 +14,7 @@
 
             <h5 class="text-center">Ou copie o código:</h5>
             <textarea id="pixCode" class="form-control mb-2" rows="3" readonly>{{ pix_copia_cola }}</textarea>
-            <button class="btn btn-outline-primary btn-sm" onclick="copiarPix()">📋 Copiar Código</button>
+            <button class="btn btn-outline-primary btn-sm" onclick="copiarPix()">Copiar Código</button>
 
             <div class="text-center mt-4">
                 <a href="/" class="btn btn-success">Voltar para o Início</a>
@@ -23,7 +23,19 @@
     </div>
 </div>
 
+
+
 <script>
+    // Função para copiar o código PIX para a área de transferência ...:
+    function copiarPix() {
+        const input = document.getElementById('pixCode');
+        input.select();
+        input.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(input.value);
+        alert('Código PIX copiado!');
+    }
+
+    // Função para verificar o status do pagamento a cada 5 segundos ...:
     function verificarPagamento() {
         fetch("{% url 'verificar_status_pagamento' pedido_id=pedido_id %}")
             .then(response => response.json())
@@ -36,15 +48,6 @@
             });
     }
     setTimeout(verificarPagamento, 5000);
-</script>
-
-<script>
-    function copiarPix() {
-        const input = document.getElementById('pixCode');
-        input.select();
-        input.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(input.value);
-        alert('Código PIX copiado!');
-    }
+    
 </script>
 {% endblock %}

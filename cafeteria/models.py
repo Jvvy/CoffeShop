@@ -4,17 +4,19 @@ from django.contrib.auth.models import User
 
 #Models para o sistema de pedidos de uma cafeteria ...:
 class Pedido(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=255)
+    cpf = models.CharField(max_length=14, blank=True, null=True , unique=True)
+    celular = models.CharField(max_length=15, blank=True, null=True)
     rua = models.CharField(max_length=255)
     numero = models.CharField(max_length=20)
     complemento = models.CharField(max_length=100, blank=True, null=True)
     bairro = models.CharField(max_length=100)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    tipo_entrega = models.CharField(  # <-- novo campo
+    tipo_entrega = models.CharField(
         max_length=20,
         choices=[('retirada', 'Retirada no Local'), ('delivery', 'Tele Entrega')],
-        default='retirada'
-    )
+        default='retirada')
     asaas_id = models.CharField(max_length=100, blank=True, null=True)
     pago = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)

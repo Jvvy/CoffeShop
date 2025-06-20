@@ -1,0 +1,4 @@
+* padronização de tamanhos
+* migrate db
+* requirements
+* componetization

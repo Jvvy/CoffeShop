@@ -3,8 +3,8 @@
 {% block title %}Finalizar Pedido - The Best Coffee{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="min-height: 100vh;">
-    <h2 class="text-center mb-4">🧾 Finalizar Pedido</h2>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Finalizar Pedido</h2>
 
     {% if mensagens %}
         {% for message in mensagens %}
@@ -44,12 +44,12 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label for="nome" class="form-label">Nome Completo</label>
-                    <input type="text" name="nome" class="form-control" required>
+                    <input type="text" name="nome" class="form-control" value="{{ nome_inicial }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="cpf" class="form-label">CPF</label>
-                    <input type="text" name="cpf" class="form-control" placeholder="Somente números" required>
+                    <input type="text" name="cpf" class="form-control" placeholder="Somente números" value="{{ cpf_inicial }}" required>
                 </div>
 
                 <div class="mb-3">
@@ -93,7 +93,7 @@
 
                 <div class="text-end">
                     <button type="submit" class="btn btn-success">Finalizar Pedido</button>
-                    <a href="{% url 'ver_carrinho' %}" class="btn btn-outline-secondary">Voltar ao Carrinho</a>
+                    <a href="{% url 'ver_carrinho' %}" class="btn btn-outline-primary">Voltar ao Carrinho</a>
                 </div>
             </form>
         </div>

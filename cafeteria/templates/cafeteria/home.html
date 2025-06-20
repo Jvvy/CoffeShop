@@ -1,52 +1,54 @@
 {% extends 'cafeteria/base.html' %}
 {% load static %}
 
-
-<!-- Título da página -->
 {% block title %}Página Inicial - Loja de Café{% endblock %}
 
-
-<!-- Adicionando CSS específico para a página inicial -->
 {% block extra_css %}
-<link href="{% static 'css/home.css' %}" rel="stylesheet">
+  <link href="{% static 'css/home.css' %}" rel="stylesheet">
+  <style>
+    .glass {
+      background: rgba(0, 0, 0, 0.1); /* semi-transparente */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px); /* para Safari */
+      border-radius: 12px;
+      padding: 2rem;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
 
-
 <!-- Banner principal -->
-<section class="text-center d-flex align-items-center justify-content-center" style="min-height: 90vh;width: 100%;color: white;">
-    <div class="container text-white">
-        <h1 class="display-3 fw-bold">Bem-vindo ao The Best Coffe</h1> <!-- display-3 = fonte grande -->
-        <p class="lead">O melhor café artesanal, servido com Dedicação e Paixão</p>
-        <a href="{% url 'lista_produtos' %}" class="btn btn-outline-light btn-lg mt-3">Ver Cardápio</a>
-    </div>
+<section class="text-center d-flex align-items-center justify-content-center" style="min-height: 90vh; width: 100%;">
+  <div class="container text-white">
+    <h1 class="display-4 fw-bold mb-3">Bem-vindo ao The Best Coffe</h1>
+    <p class="lead mb-4">O melhor café artesanal, servido com Dedicação e Paixão</p>
+    <a href="{% url 'lista_produtos' %}" class="btn btn-outline-light btn-lg px-4 py-2 shadow-sm">Ver Cardápio</a>
+  </div>
 </section>
 
-
-<!--  Nossa História -->
-<section class="py-5 d-flex align-items-center" style="background-color: transparent; min-height: 70vh; width: 100%;">
-    <div class="container-fluid text-center">
-        <h2 class="display-5 fw-bold">Nossa História</h2> <!-- display-5 = fonte maior -->
-        <p class="lead" style="max-width: 900px; margin: auto; color: #fff;">
-            Fundada em 2023, nossa cafeteria nasceu da paixão por cafés especiais e bons momentos. 
-            Cada grão é selecionado a dedo para trazer um sabor inesquecível em cada xícara. 
-            Venha viver uma experiência única conosco!
-        </p>
-    </div>
+<!-- Nossa História -->
+<section class="py-5 d-flex align-items-center justify-content-center" style="min-height: 70vh; width: 100%;">
+  <div class="container text-center text-white">
+    <h2 class="display-5 fw-bold mb-4">Nossa História</h2>
+    <p class="lead mx-auto" style="max-width: 900px;">
+      Fundada em 2023, nossa cafeteria nasceu da paixão por cafés especiais e bons momentos. 
+      Cada grão é selecionado a dedo para trazer um sabor inesquecível em cada xícara. 
+      Venha viver uma experiência única conosco!
+    </p>
+  </div>
 </section>
 
-
-<!--  Onde nos encontrar -->
-<section class="py-5 d-flex align-items-center" style="background-color: transparent; min-height: 60vh; width: 100%;">
-    <div class="container-fluid text-center text-white">
-        <h2 class="display-5 fw-bold">Onde nos Encontrar</h2> <!-- display-5 também -->
-        <p class="lead" style="max-width: 700px; margin: auto;">
-            📍 Rua das Flores, 123 - Centro<br>
-            São Paulo - SP<br>
-            Aberto de Segunda a Sábado, das 08h às 20h.
-        </p>
-    </div>
+<!-- Onde nos encontrar -->
+<section class="py-5 d-flex align-items-center justify-content-center" style="min-height: 60vh; width: 100%;">
+  <div class="container text-center text-white">
+    <h2 class="display-5 fw-bold mb-4">Onde nos Encontrar</h2>
+    <p class="lead mx-auto" style="max-width: 700px;">
+      📍 Rua das Flores, 123 - Centro<br>
+      São Paulo - SP<br>
+      Aberto de Segunda a Sábado, das 08h às 20h.
+    </p>
+  </div>
 </section>
 
 {% endblock %}

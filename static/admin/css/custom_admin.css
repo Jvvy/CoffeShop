@@ -1,0 +1,15 @@
+/* Header */
+#header {
+    background-color: #6F4E37 !important; /* marrom café */
+}
+
+#header a {
+    color: white !important;
+}
+
+/* Botões padrão */
+.button.default {
+    background-color: #6F4E37 !important;
+    color: white !important;
+    border-color: #6F4E37 !important;
+}

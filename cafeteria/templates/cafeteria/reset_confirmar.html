@@ -2,7 +2,7 @@
 {% block title %}Nova Senha{% endblock %}
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">🔐 Digite sua Nova Senha</h2>
+    <h2 class="text-center mb-4">Digite sua Nova Senha</h2>
     <form method="post" class="card p-4 shadow mx-auto" style="max-width: 500px;">
         {% csrf_token %}
         {{ form.as_p }}

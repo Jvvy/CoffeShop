@@ -3,47 +3,50 @@
 {% block title %}Carrinho de Compras{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="min-height: 100vh;">
+<div class="container mt-5">
     <h2 class="text-center mb-4">Carrinho de Compras</h2>
 
     {% if itens %}
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Produto</th>
-                    <th>Preço</th>
-                    <th>Quantidade</th>
-                    <th>Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in itens %}
-                    <tr>
-                        <td>{{ item.produto.nome }}</td>
-                        <td>R$ {{ item.produto.preco }}</td>
-                        <td>
-                            <form action="{% url 'alterar_quantidade' item.produto.id %}" method="post" class="d-flex align-items-center">
-                                {% csrf_token %}
-                                <button type="submit" name="quantidade" value="{{ item.quantidade|add:"-1" }}" class="btn btn-sm btn-outline-secondary me-2" {% if item.quantidade == 1 %}disabled{% endif %}>–</button>
-                                <span>{{ item.quantidade }}</span>
-                                <button type="submit" name="quantidade" value="{{ item.quantidade|add:"1" }}" class="btn btn-sm btn-outline-secondary ms-2">+</button>
-                            </form>
-                        </td>
-                        <td>R$ {{ item.subtotal }}</td>
-                        <td>
-                            <a href="{% url 'remover_do_carrinho' item.produto.id %}" class="btn btn-sm btn-danger">Remover</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
 
-        <div class="text-end">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itens %}
+                        <tr>
+                            <td>{{ item.produto.nome }}</td>
+                            <td>R$ {{ item.produto.preco }}</td>
+                            <td>
+                                <form action="{% url 'alterar_quantidade' item.produto.id %}" method="post" class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <button type="submit" name="quantidade" value="{{ item.quantidade|add:"-1" }}" class="btn btn-sm btn-outline-primary me-2" {% if item.quantidade == 1 %}disabled{% endif %}>–</button>
+                                    <span>{{ item.quantidade }}</span>
+                                    <button type="submit" name="quantidade" value="{{ item.quantidade|add:"1" }}" class="btn btn-sm btn-outline-primary ms-2">+</button>
+                                </form>
+                            </td>
+                            <td>R$ {{ item.subtotal }}</td>
+                            <td>
+                                <a href="{% url 'remover_do_carrinho' item.produto.id %}" class="btn btn-sm btn-danger">Remover</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end pt-2">
             <h4>Total: <strong>R$ {{ total }}</strong></h4>
         </div>
         <div class="text-end mt-3">
-            <a href="{% url 'lista_produtos' %}" class="btn btn-outline-secondary">Continuar comprando</a>
+            <a href="{% url 'lista_produtos' %}" class="btn btn-outline-primary">Continuar comprando</a>
             <a href="{% url 'finalizar_pedido' %}" class="btn btn-success">Finalizar Pedido</a>
         </div>
 
@@ -52,7 +55,7 @@
             Seu carrinho está vazio.
         </div>
         <div class="text-center mt-3">
-            <a href="{% url 'lista_produtos' %}" class="btn btn-primary">Ir para o Cardápio</a>
+            <a href="{% url 'lista_produtos' %}" class="btn btn-dark">Ir para o Cardápio</a>
         </div>
     {% endif %}
 </div>
